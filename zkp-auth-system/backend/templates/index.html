@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Home - ZKP Authentication{% endblock %}
+
+{% block content %}
+<h1>🔐 ZKP Authentication System</h1>
+<p class="subtitle">Zero-Knowledge Proof using Schnorr Protocol</p>
+
+<div id="auth-status" class="status" style="display: none;"></div>
+
+<div id="authenticated-content" style="display: none;">
+    <div class="info-box">
+        <h3>✅ You are authenticated!</h3>
+        <p>Your identity has been verified using Zero-Knowledge Proof without revealing your private key.</p>
+    </div>
+    <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+</div>
+
+<div id="unauthenticated-content">
+    <div class="info-box">
+        <h3>🔒 Secure Authentication</h3>
+        <p>This system uses Schnorr Zero-Knowledge Proof protocol. Your private key never leaves your device.</p>
+        <ul style="margin-top: 10px; padding-left: 20px; color: #666;">
+            <li>Register to generate your key pair</li>
+            <li>Login by proving you know your private key</li>
+            <li>Your private key is never transmitted</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="/register" style="display: inline-block; width: 48%; margin-right: 2%;">
+            <button class="btn">Register</button>
+        </a>
+        <a href="/login" style="display: inline-block; width: 48%;">
+            <button class="btn btn-secondary">Login</button>
+        </a>
+    </div>
+</div>
+
+<script src="/static/js/zkp-client.js"></script>
+<script>
+    // Check authentication status on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+        const isAuthenticated = await checkAuth();
+        const authStatus = document.getElementById('auth-status');
+        const authContent = document.getElementById('authenticated-content');
+        const unauthContent = document.getElementById('unauthenticated-content');
+        
+        if (isAuthenticated) {
+            authStatus.style.display = 'block';
+            authStatus.className = 'status success';
+            authStatus.textContent = '✓ Authenticated';
+            authContent.style.display = 'block';
+            unauthContent.style.display = 'none';
+        } else {
+            authStatus.style.display = 'none';
+            authContent.style.display = 'none';
+            unauthContent.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}
+

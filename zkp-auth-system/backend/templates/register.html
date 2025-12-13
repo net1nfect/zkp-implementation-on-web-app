@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Register - ZKP Authentication{% endblock %}
+
+{% block content %}
+<h1>📝 Register</h1>
+<p class="subtitle">Create a new account with Zero-Knowledge Proof</p>
+
+<div class="info-box">
+    <h3>How it works:</h3>
+    <p>When you register, a cryptographic key pair will be generated in your browser. Only your public key will be sent to the server. Your private key stays on your device.</p>
+</div>
+
+<form id="register-form" onsubmit="event.preventDefault(); handleRegister();">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Enter your username">
+    </div>
+    
+    <button type="submit" class="btn">Generate Keys & Register</button>
+</form>
+
+<div class="nav-links">
+    <a href="/">Home</a> | 
+    <a href="/login">Already have an account? Login</a>
+</div>
+
+<script src="/static/js/zkp-client.js"></script>
+{% endblock %}
+

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login - ZKP Authentication{% endblock %}
+
+{% block content %}
+<h1>🔑 Login</h1>
+<p class="subtitle">Prove you know your private key without revealing it</p>
+
+<div class="info-box">
+    <h3>Zero-Knowledge Proof:</h3>
+    <p>You will generate a cryptographic proof that you know your private key, without actually sending the key to the server. This is the magic of Zero-Knowledge Proof!</p>
+</div>
+
+<form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Enter your username">
+    </div>
+    
+    <button type="submit" class="btn">Generate Proof & Login</button>
+</form>
+
+<div class="nav-links">
+    <a href="/">Home</a> | 
+    <a href="/register">Don't have an account? Register</a>
+</div>
+
+<script src="/static/js/zkp-client.js"></script>
+{% endblock %}
+
