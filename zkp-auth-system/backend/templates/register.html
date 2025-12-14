@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Register - ZKP Authentication{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-icon {
+        font-size: 48px;
+        text-align: center;
+        margin-bottom: 20px;
+        animation: iconSpin 4s linear infinite;
+    }
+
+    @keyframes iconSpin {
+        0% {
+            transform: rotate(0deg) scale(1);
+        }
+        50% {
+            transform: rotate(180deg) scale(1.1);
+        }
+        100% {
+            transform: rotate(360deg) scale(1);
+        }
+    }
+
+    .key-visualization {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 20px 0;
+        opacity: 0.6;
+    }
+
+    .key-part {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        animation: keyPulse 2s ease infinite;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .key-part:nth-child(2) {
+        animation-delay: 0.3s;
+    }
+
+    .key-part:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+
+    @keyframes keyPulse {
+        0%, 100% {
+            transform: scale(1) translateY(0);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        50% {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+    }
+
+    .security-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(40, 167, 69, 0.2);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 20px;
+        color: #28a745;
+        font-size: 12px;
+        margin-top: 15px;
+        animation: badgeGlow 2s ease infinite;
+    }
+
+    @keyframes badgeGlow {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 15px 5px rgba(40, 167, 69, 0.2);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-icon">🔑</div>
+<h1>Create Your Identity</h1>
+<p class="subtitle">Generate your cryptographic key pair securely</p>
+
+<div class="key-visualization">
+    <div class="key-part">🔐</div>
+    <div class="key-part">🔑</div>
+    <div class="key-part">🔒</div>
+</div>
+
+<div class="info-box">
+    <h3>🔒 How It Works</h3>
+    <p>When you register, a cryptographic key pair will be generated <strong>in your browser</strong>. Only your public key will be sent to the server. Your private key stays securely on your device and never leaves it.</p>
+</div>
+
+<form id="register-form" onsubmit="event.preventDefault(); handleRegister();">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Choose your username" autocomplete="username">
+    </div>
+    
+    <button type="submit" class="btn" id="register-btn">
+        <span>Generate Keys & Register</span>
+    </button>
+    
+    <div class="security-badge">
+        <span>🔒</span>
+        <span>Private key stays on your device</span>
+    </div>
+</form>
+
+<div class="nav-links">
+    <a href="/">Home</a> | 
+    <a href="/login">Already have an account? Login</a>
+</div>
+
+<script src="/static/js/zkp-client.js"></script>
+<script>
+    // Enhanced register handler with animations
+    const originalHandleRegister = handleRegister;
+    
+    handleRegister = async function() {
+        const btn = document.getElementById('register-btn');
+        const keyParts = document.querySelectorAll('.key-part');
+        
+        // Animate key generation
+        btn.classList.add('loading');
+        btn.innerHTML = '<div class="loading"></div> Generating keys...';
+        
+        // Animate key parts
+        keyParts.forEach((part, index) => {
+            setTimeout(() => {
+                part.style.animation = 'keyPulse 0.5s ease infinite';
+            }, index * 200);
+        });
+        
+        try {
+            await originalHandleRegister();
+        } catch (error) {
+            console.error('Registration error:', error);
+        } finally {
+            // Reset UI
+            btn.classList.remove('loading');
+            btn.innerHTML = '<span>Generate Keys & Register</span>';
+            keyParts.forEach(part => {
+                part.style.animation = 'keyPulse 2s ease infinite';
+            });
+        }
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Login - ZKP Authentication{% endblock %}
+
+{% block extra_css %}
+<style>
+    .zkp-icon {
+        font-size: 48px;
+        text-align: center;
+        margin-bottom: 20px;
+        animation: iconFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes iconFloat {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-10px) rotate(5deg);
+        }
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-group::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transition: width 0.3s ease;
+    }
+
+    .form-group:focus-within::after {
+        width: 100%;
+    }
+
+    .btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn.loading {
+        pointer-events: none;
+    }
+
+    .btn.loading span {
+        opacity: 0;
+    }
+
+    .proof-animation {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+    }
+
+    .proof-animation.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .proof-steps {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .proof-step {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.3);
+        animation: stepPulse 1.5s ease infinite;
+    }
+
+    .proof-step.active {
+        background: #667eea;
+        animation: stepPulse 0.5s ease infinite;
+    }
+
+    @keyframes stepPulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.5);
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="zkp-icon">🔐</div>
+<h1>Zero-Knowledge Login</h1>
+<p class="subtitle">Prove your identity without revealing your secret</p>
+
+<div class="info-box">
+    <h3>✨ Zero-Knowledge Proof Magic</h3>
+    <p>Generate a cryptographic proof that you know your private key, without ever sending the key to the server. Your secret stays with you!</p>
+</div>
+
+<form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Enter your username" autocomplete="username">
+    </div>
+    
+    <button type="submit" class="btn" id="login-btn">
+        <span>Generate Proof & Login</span>
+    </button>
+</form>
+
+<div class="proof-animation" id="proof-animation">
+    <div>Generating cryptographic proof...</div>
+    <div class="proof-steps">
+        <div class="proof-step active"></div>
+        <div class="proof-step"></div>
+        <div class="proof-step"></div>
+    </div>
+</div>
+
+<div class="nav-links">
+    <a href="/">Home</a> | 
+    <a href="/register">Don't have an account? Register</a>
+</div>
+
+<script src="/static/js/zkp-client.js"></script>
+<script>
+    // Enhanced login handler with animations
+    const originalHandleLogin = handleLogin;
+    
+    handleLogin = async function() {
+        const btn = document.getElementById('login-btn');
+        const proofAnim = document.getElementById('proof-animation');
+        const steps = proofAnim.querySelectorAll('.proof-step');
+        
+        // Show loading state
+        btn.classList.add('loading');
+        btn.innerHTML = '<div class="loading"></div> Processing...';
+        proofAnim.classList.add('active');
+        
+        // Animate steps
+        let currentStep = 0;
+        const stepInterval = setInterval(() => {
+            steps[currentStep].classList.remove('active');
+            currentStep = (currentStep + 1) % steps.length;
+            steps[currentStep].classList.add('active');
+        }, 500);
+        
+        try {
+            await originalHandleLogin();
+        } catch (error) {
+            console.error('Login error:', error);
+        } finally {
+            // Reset UI
+            clearInterval(stepInterval);
+            btn.classList.remove('loading');
+            btn.innerHTML = '<span>Generate Proof & Login</span>';
+            proofAnim.classList.remove('active');
+            steps.forEach(step => step.classList.remove('active'));
+        }
+    };
+</script>
+{% endblock %}
